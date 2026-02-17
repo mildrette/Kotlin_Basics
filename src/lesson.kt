@@ -22,4 +22,17 @@ fun main(){
 
 
 //    read only list
+
+    val shapes = listOf("square", "circle", "Triangle", "rectangle")
+    println(shapes)
+
+    val cars: MutableList<String> = mutableListOf("toyota", "cares", "another", "again")
+    println(cars)
+
+    val code= listOf(1, 2, 3, 4, 5)
+    print(code)
+
+    val figure: MutableList<Int> = mutableListOf(1, 2, 3, 4, 5, 6,7,8,9,10)
+    val figureLocked: List<Int> = figure
+    println("the first number of the list is ${figure.first()} and the last number is ${figure.last()}")
 }
