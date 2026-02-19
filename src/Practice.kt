@@ -1,12 +1,14 @@
 fun main(){
 
-  val age:Int
-  val name = true
+val score = 50
 
-    if(name) {
-        age = 30
-    } else {
-        age = 31
+    if(score >= 50 && score <= 100){
+        println("you Passed")}
+    else if(score < 50){
+            println("You Failed")
+        }
+    else if (score > 100 || score < 0){
+            println("Invalid")
+        }
     }
-     println(age)
-}
+
