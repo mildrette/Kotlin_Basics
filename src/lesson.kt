@@ -59,7 +59,24 @@ fun main() {
 
 
 //    Map
+ val readOnlyFood = mapOf("apple" to 250, "lemon" to 100, "orange" to 50, "pineapple" to 500)
+    println(readOnlyFood)
 
+    val canAddFood: MutableMap<String, Int> = mutableMapOf("apple" to 250, "lemon" to 100, "orange" to 50, "pineapple" to 500)
+
+    println("i need ${canAddFood["limes"]}")
+    println("i need ${canAddFood["apple"]}")
+
+    canAddFood["limes"] = 350
+    canAddFood.remove("apple")
+    println(canAddFood.count())
+    println(canAddFood.containsKey("limes"))
+    println(canAddFood.values)
+    println(canAddFood.keys)
+
+    println(500 in canAddFood.values)
+    println("apple" in canAddFood.keys)
+    println("orange" in canAddFood.keys)
 
 
 
