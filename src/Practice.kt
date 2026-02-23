@@ -1,14 +1,12 @@
-fun main(){
 
-val score = 50
+val name:String = "Mildred"
+var age:Int = 30
 
-    if(score >= 50 && score <= 100){
-        println("you Passed")}
-    else if(score < 50){
-            println("You Failed")
-        }
-    else if (score > 100 || score < 0){
-            println("Invalid")
-        }
-    }
+fun main() {
 
+    println(name)
+    println(age)
+
+    age= 31
+    println(age)
+}
