@@ -1,2 +1,0 @@
-//Goal: Make programs interactive.
-
