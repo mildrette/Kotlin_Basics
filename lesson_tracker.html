@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Learning Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #ecdfc0;
+    --paper-dark: #e2d2ab;
+    --ink: #3a2c1c;
+    --ink-soft: #5c4a34;
+    --maroon: #7a2e2b;
+    --gold: #9c7a34;
+    --sage: #6b7a4f;
+    --rule: #b9a06e;
+    --shadow: rgba(58,44,28,0.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255,255,255,0.08), transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'EB Garamond', serif;
+    min-height:100vh;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(120,90,50,0.035) 0px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(0deg, rgba(120,90,50,0.03) 0px, transparent 1px, transparent 3px);
+    pointer-events:none;
+    z-index:0;
+  }
+  .vignette{
+    position:fixed; inset:0;
+    box-shadow: inset 0 0 140px rgba(58,44,28,0.35);
+    pointer-events:none;
+    z-index:1;
+  }
+  .book{
+    position:relative; z-index:2;
+    max-width:880px;
+    margin:0 auto;
+    padding:48px 28px 100px;
+  }
+  .frontispiece{
+    text-align:center;
+    padding-bottom:28px;
+    border-bottom:2px double var(--rule);
+    margin-bottom:8px;
+  }
+  .frontispiece .eyebrow{
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--maroon);
+    font-weight:600;
+  }
+  .frontispiece h1{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:700;
+    font-size:52px;
+    margin:8px 0 4px;
+    color:var(--ink);
+  }
+  .frontispiece .sub{
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:17px;
+  }
+  .toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin:26px 0 40px;
+  }
+  .toc button{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.03em;
+    background:var(--paper-dark);
+    border:1px solid var(--rule);
+    color:var(--ink);
+    padding:10px 18px;
+    cursor:pointer;
+    border-radius:2px 10px 2px 10px;
+    box-shadow:1px 1px 0 var(--rule);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .toc button:hover{ transform:translateY(-2px); }
+  .toc button.active{
+    background:var(--maroon);
+    color:var(--paper);
+    border-color:var(--maroon);
+  }
+  .progress-line{
+    text-align:center;
+    font-size:13px;
+    color:var(--ink-soft);
+    letter-spacing:0.05em;
+    margin-bottom:6px;
+    font-style:italic;
+  }
+  .chapter{ display:none; }
+  .chapter.active{ display:block; animation:fadein .35s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .chapter-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    margin:34px 0 22px;
+  }
+  .chapter-num{
+    font-family:'Cormorant Garamond', serif;
+    font-size:44px;
+    color:var(--gold);
+    font-weight:700;
+    line-height:1;
+  }
+  .chapter-head h2{
+    font-family:'Cormorant Garamond', serif;
+    font-size:28px;
+    font-weight:700;
+    margin:0;
+    color:var(--maroon);
+  }
+  .chapter-head .desc{
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:14px;
+    margin-top:2px;
+  }
+
+  .lesson{
+    position:relative;
+    border-top:1px solid var(--rule);
+    padding:20px 4px 22px 4px;
+  }
+  .lesson:last-child{ border-bottom:1px solid var(--rule); }
+
+  .lesson-row{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+  }
+  .check-wrap{
+    flex-shrink:0;
+    margin-top:4px;
+  }
+  .check-wrap input{ display:none; }
+  .seal{
+    width:26px; height:26px;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    color:transparent;
+    font-size:15px;
+    background:radial-gradient(circle at 35% 30%, #f3e7c9, var(--paper-dark));
+    transition:all .2s ease;
+    user-select:none;
+  }
+  .seal:hover{ border-color:var(--maroon); }
+  .check-wrap input:checked + .seal{
+    background:radial-gradient(circle at 35% 30%, #8a9967, var(--sage));
+    border-color:var(--sage);
+    color:var(--paper);
+  }
+  .lesson-title{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:700;
+    font-size:20px;
+    color:var(--ink);
+    margin:0 0 4px;
+  }
+  .lesson.done .lesson-title{ color:var(--sage); }
+  .lesson-body{
+    font-size:15.5px;
+    line-height:1.55;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+  }
+  .notes-label{
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:600;
+    margin-bottom:4px;
+    display:block;
+  }
+  textarea{
+    width:100%;
+    min-height:56px;
+    resize:vertical;
+    background:rgba(255,255,255,0.35);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    font-family:'EB Garamond', serif;
+    font-size:14.5px;
+    color:var(--ink);
+    padding:8px 10px;
+    line-height:1.5;
+  }
+  textarea:focus{ outline:1.5px solid var(--maroon); background:rgba(255,255,255,0.55); }
+  .save-flag{
+    font-size:11px;
+    color:var(--sage);
+    font-style:italic;
+    height:14px;
+    margin-top:4px;
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .save-flag.show{ opacity:1; }
+
+  .flourish{
+    text-align:center;
+    color:var(--gold);
+    font-size:18px;
+    margin:36px 0;
+    letter-spacing:0.4em;
+  }
+  .colophon{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin-top:50px;
+    letter-spacing:0.04em;
+  }
+  @media (max-width:600px){
+    .frontispiece h1{ font-size:36px; }
+    .chapter-num{ font-size:32px; }
+    .chapter-head h2{ font-size:22px; }
+  }
+</style>
+</head>
+<body>
+<div class="vignette"></div>
+<div class="book">
+
+  <div class="frontispiece">
+    <div class="eyebrow">A Household Volume, Kept by Hand</div>
+    <h1>The Learning Ledger</h1>
+    <div class="sub">Four chapters — a plan for him, and a plan for you</div>
+  </div>
+
+  <div class="toc" id="toc"></div>
+  <div class="progress-line" id="progressLine"></div>
+
+  <div id="chapters"></div>
+
+  <div class="colophon">Mark what is finished. Write what you noticed. Return whenever you're ready.</div>
+</div>
+
+<script>
+const DATA = [
+  {
+    title: "Raising a Reader",
+    desc: "Four weeks, before school begins — reading, numbers, and finding his words",
+    lessons: [
+      {t:"Week 1 · Letter Sounds A–J", b:"Teach the sound, not the name (\u201cah\u201d not \u201cay\u201d). Tie each letter to an object in the house. End the week with a singing review, no pressure."},
+      {t:"Week 2 · Letters K–P, Tracing & First Blends", b:"Trace letters in sand, rice, or air to link hand and eye — this helps with reversals. Introduce blending: stretch c-a-t slowly, then say it fast."},
+      {t:"Week 3 · Letters Q–Z & First Words", b:"Finish the alphabet. Build five 3-letter words: cat, dog, sun, pen, cup. He reads each, then draws it."},
+      {t:"Week 4 · Consolidation & Small Celebration", b:"Review everything. Add his name and 2–3 sight words. Close the week reading a simple picture book together."},
+      {t:"Math Week 1 · Numbers 1–10", b:"Say them, recognise the written digit, match to real objects — stones, spoons, toys."},
+      {t:"Math Week 2 · Numbers 11–20 & Writing", b:"Same tracing method as letters, now applied to digits 1–10, to guard against reversals."},
+      {t:"Math Week 3 · Addition with Objects", b:"Keep it physical: \u2018you have 2 stones, I give you 1 more, how many now?\u2019 Hands before symbols."},
+      {t:"Math Week 4 · Subtraction & Mixed Review", b:"Same object method for subtraction, then a review game mixing both, with a small reward for getting it right."},
+      {t:"Talking Week 1 · Personal Facts", b:"His name, his age, his favourite colour and food. If he can't answer, tell him, then ask again minutes later."},
+      {t:"Talking Week 2 · Choices & Reasons", b:"\u2018Rice or plantain — why?\u2019 Push gently for the why, even one word counts as progress."},
+      {t:"Talking Week 3 · Following Instructions", b:"\u2018Please bring me the cup from the table\u2019 — one item in view at first, then slowly more, to build search-and-select."},
+      {t:"Talking Week 4 · Greetings & Role-Play", b:"Practice greeting, saying his name, asking a question back. Take turns being visitor and host."},
+      {t:"Daily Routine & Screen Time", b:"Learn first, always, before any screen. Earned screen time after: 45 min–1 hr. Keep the learning task small enough to be winnable."}
+    ]
+  },
+  {
+    title: "Programming Fundamentals",
+    desc: "A separate project — build confidence where it feels lighter, before returning to what feels heavy",
+    lessons: [
+      {t:"Variables & Data Types", b:"A labeled box: the name is the label, the value is what's inside. String, number, boolean, float (smaller/less precise), double (larger/more precise)."},
+      {t:"Operators", b:"Not really math — just questions. \u2018Is 5 greater than 3?\u2019 The answer is only ever true or false."},
+      {t:"Conditionals", b:"If this happens, do that, otherwise do something else — exactly like deciding whether to carry an umbrella."},
+      {t:"Loops", b:"Repeat an action without rewriting it — \u2018brush every tooth\u2019 instead of naming each one."},
+      {t:"Functions", b:"A recipe card. Write the steps once, name it, and reuse it — \u2018make tea\u2019 instead of listing the steps again."},
+      {t:"Data Structures (Lists)", b:"A pencil case instead of one box per pencil — an ordered collection you can loop through."},
+      {t:"Input & Output", b:"Input is someone telling you something; output is you telling them something back — usually starts as simply printing to the screen."},
+      {t:"Error Handling", b:"A backup plan for when something goes wrong, so the whole program doesn't crash — save this one for later."}
+    ]
+  },
+  {
+    title: "After the Fundamentals",
+    desc: "What comes next, once the eight fundamentals feel steady",
+    lessons: [
+      {t:"Object Oriented Programming", b:"One blueprint (a class) you can stamp out many objects from, instead of separate loose variables and functions."},
+      {t:"Basic Testing", b:"Tasting the food while cooking — small checks that your code works, before anyone else sees it."},
+      {t:"Working with APIs", b:"Ordering through a waiter: you ask, the kitchen prepares it, the waiter brings it back."},
+      {t:"Asynchronous Programming", b:"Rice on the stove while you prep other food — not standing and staring while something slow finishes."},
+      {t:"Deeper Git Skills", b:"Branching strategy, resolving conflicts with confidence, pull requests as communication, not just formality."},
+      {t:"Design Patterns", b:"Proven recipes other cooks already worked out, so you're not reinventing the dish each time."},
+      {t:"App Architecture", b:"Deciding where UI, logic, and data each live as an app grows — directly relevant to your Compose work."}
+    ]
+  },
+  {
+    title: "Backend Development",
+    desc: "For venturing behind the screen — in Python or in Kotlin",
+    lessons: [
+      {t:"How the Web Works", b:"What a server and client are, and what a request and response look like between them."},
+      {t:"Choosing a Framework", b:"Python: Flask or FastAPI. Kotlin: Ktor. Pick one and learn to build routes — addresses your app responds to."},
+      {t:"Databases", b:"A very organised filing cabinet instead of scattered papers. Start with SQLite — light, and good for learning CRUD."},
+      {t:"Authentication & Security", b:"Passwords are never stored in plain text. Learn what a token is, and the basics of keeping data private."},
+      {t:"Building APIs (the other side)", b:"You already consume APIs from Android. Now decide what data to send back, and how to fail gracefully."},
+      {t:"Deployment Basics", b:"Getting your code running somewhere real, beyond your own laptop — plus environment variables."},
+      {t:"Dev, Test & Production", b:"Understanding the difference between where you build, where you check, and where real users live."}
+    ]
+  }
+];
+
+const chaptersEl = document.getElementById('chapters');
+const tocEl = document.getElementById('toc');
+const progressEl = document.getElementById('progressLine');
+const roman = ["I","II","III","IV"];
+let state = {}; // key -> {checked, notes}
+
+function lessonKey(ci, li){ return `lesson_${ci}_${li}`; }
+
+function render(){
+  chaptersEl.innerHTML = '';
+  tocEl.innerHTML = '';
+
+  DATA.forEach((chapter, ci) => {
+    const btn = document.createElement('button');
+    btn.textContent = chapter.title;
+    btn.dataset.ci = ci;
+    btn.className = ci === 0 ? 'active' : '';
+    btn.onclick = () => showChapter(ci);
+    tocEl.appendChild(btn);
+
+    const sec = document.createElement('div');
+    sec.className = 'chapter' + (ci === 0 ? ' active' : '');
+    sec.id = 'chapter-' + ci;
+
+    const head = document.createElement('div');
+    head.className = 'chapter-head';
+    head.innerHTML = `<div class="chapter-num">${roman[ci]}</div><div><h2>${chapter.title}</h2><div class="desc">${chapter.desc}</div></div>`;
+    sec.appendChild(head);
+
+    chapter.lessons.forEach((lesson, li) => {
+      const key = lessonKey(ci, li);
+      const saved = state[key] || {checked:false, notes:""};
+
+      const div = document.createElement('div');
+      div.className = 'lesson' + (saved.checked ? ' done' : '');
+      div.innerHTML = `
+        <div class="lesson-row">
+          <div class="check-wrap">
+            <input type="checkbox" id="chk-${key}" ${saved.checked ? 'checked' : ''}>
+            <label class="seal" for="chk-${key}">&#10003;</label>
+          </div>
+          <div style="flex:1">
+            <p class="lesson-title">${lesson.t}</p>
+            <p class="lesson-body">${lesson.b}</p>
+            <span class="notes-label">Notes</span>
+            <textarea id="note-${key}" placeholder="What did you notice? What worked, what didn't...">${saved.notes}</textarea>
+            <div class="save-flag" id="flag-${key}">kept.</div>
+          </div>
+        </div>
+      `;
+      sec.appendChild(div);
+
+      const checkbox = div.querySelector(`#chk-${key}`);
+      checkbox.addEventListener('change', () => {
+        div.classList.toggle('done', checkbox.checked);
+        saveField(key, {checked: checkbox.checked, notes: textarea.value});
+        updateProgress();
+      });
+
+      const textarea = div.querySelector(`#note-${key}`);
+      let debounceTimer;
+      textarea.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          saveField(key, {checked: checkbox.checked, notes: textarea.value});
+        }, 500);
+      });
+    });
+
+    if (ci < DATA.length - 1) {
+      const fl = document.createElement('div');
+      fl.className = 'flourish';
+      fl.textContent = '\u2766';
+      sec.appendChild(fl);
+    }
+
+    chaptersEl.appendChild(sec);
+  });
+
+  updateProgress();
+}
+
+function showChapter(ci){
+  document.querySelectorAll('.chapter').forEach(el => el.classList.remove('active'));
+  document.getElementById('chapter-' + ci).classList.add('active');
+  document.querySelectorAll('.toc button').forEach(b => b.classList.toggle('active', +b.dataset.ci === ci));
+  updateProgress(ci);
+}
+
+function updateProgress(ci){
+  const active = ci !== undefined ? ci : [...document.querySelectorAll('.chapter')].findIndex(el => el.classList.contains('active'));
+  const chapter = DATA[active];
+  let done = 0;
+  chapter.lessons.forEach((_, li) => { if (state[lessonKey(active, li)]?.checked) done++; });
+  progressEl.textContent = `${done} of ${chapter.lessons.length} marked complete in this chapter`;
+}
+
+async function saveField(key, value){
+  state[key] = value;
+  const flag = document.getElementById('flag-' + key);
+  try {
+    await window.storage.set(key, JSON.stringify(value), false);
+    if (flag){ flag.classList.add('show'); setTimeout(() => flag.classList.remove('show'), 1200); }
+  } catch (e) {
+    console.error('Could not save', e);
+  }
+}
+
+async function loadAll(){
+  try {
+    for (let ci = 0; ci < DATA.length; ci++){
+      for (let li = 0; li < DATA[ci].lessons.length; li++){
+        const key = lessonKey(ci, li);
+        try {
+          const res = await window.storage.get(key, false);
+          if (res && res.value) state[key] = JSON.parse(res.value);
+        } catch(e) { /* key not found yet, fine */ }
+      }
+    }
+  } catch(e) {
+    console.error('Load error', e);
+  }
+  render();
+}
+
+loadAll();
+</script>
+</body>
+</html>
