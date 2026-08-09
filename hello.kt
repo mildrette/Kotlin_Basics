@@ -36,28 +36,54 @@ fun main(){
 
 // loops 
 
-        for (i in 1..3){
-            println("I made it to step $i")
-        }
+        // for (i in 1..3){
+        //     println("I made it to step $i")
+        // }
 
 
-        var meals = 10
-        while (meals > 0){
-            println("slurp, soup left $meals")
-            meals = meals - 1
-        }
+        // var meals = 10
+        // while (meals > 0){
+        //     println("slurp, soup left $meals")
+        //     meals = meals - 1
+        // }
 
-        for (greetings in 1..5){
-            println ("Hello, Good morning Number $greetings")
-        }
+        // for (greetings in 1..5){
+        //     println ("Hello, Good morning Number $greetings")
+        // }
 
 
-        var names = arrayOf("Mildred", "Moses", "Moses", "Moses", "Moses")
+        // var names = arrayOf("Mildred", "Moses", "Moses", "Moses", "Moses")
 
-        for (name in names){
-            println("Hello $name, welcome to my channel")
-        }
+        // for (name in names){
+        //     println("Hello $name, welcome to my channel")
+        // }
+
+        // var favoriteFruits = arrayOf("Nango", "Banana", "Avocado", "Pineapple", "Strawberry")
+
+        // for (fruit in favoriteFruits){
+        //     println("I love eating $fruit")
+        // }
+
+
+        // functions
+// learning("Kotlin")
+// learning("Java")
+welcomeDesk("Mildred", 31, "Singing")
+    
 }
 
 
+    // fun learning(lesson: String){
+    //         println("I am Learning $lesson")
+    //     }
 
+
+
+
+        fun welcomeDesk(name: String, age: Int, hobby: String){
+            for(i in 1..3){
+                println("i love $hobby")
+            }
+
+            println("Hello everyone, my name is $name, I am $age years old and I love $hobby")
+        }
