@@ -1,18 +1,10 @@
 fun main(){
 
-var messageLengths = arrayOf(50, 100, 150, 200, 250)
+println("whats is your name? ")
 
-for(i in messageLengths){
-    var canSend = canSendMessages(i)
-    println("$i characters : can send? $canSend")
-}
+var name = readln()
+println("hello $name")
 
  }
 
 
-
-fun canSendMessages(messages: Int): Boolean{
-    if(messages <= 160){
-        return true
-    } else { return false}
-}
