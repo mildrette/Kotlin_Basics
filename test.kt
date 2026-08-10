@@ -161,3 +161,12 @@
 // fun characterLeft(messageLength: Int): Int{
 //   return 160 - messageLength
 // }
+
+// fun main(){
+
+// println("whats is your name? ")
+
+// var name = readln()
+// println("hello $name")
+
+//  }
